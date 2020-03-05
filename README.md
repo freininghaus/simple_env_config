@@ -11,6 +11,7 @@ ADMIN_PORT = int(os.getenv("PORT", 8081))
 TARGET_SERVICE_HOST = os.getenv("TARGET_SERVICE_HOST", "127.0.0.1")
 TARGET_SERVICE_PORT = int(os.getenv("PORT", 8090))
 K8S_NAMESPACE = os.env["K8S_NAMESPACE"]  # required, no default value
+DEBUG_MODE = os.getenv("DEBUG_MODE", "0").lower() in ("1", "true", "yes", "on")
 
 run_app(PORT, ADMIN_PORT, ...)
 ```
@@ -27,6 +28,7 @@ class Config:
     TARGET_SERVICE_HOST: str = "127.0.0.1"
     TARGET_SERVICE_PORT: int = 8090
     K8S_NAMESPACE: str
+    DEBUG_MODE: bool = False
     
 
 run_app(Config.PORT, Config.ADMIN_PORT, ...)
