@@ -2,7 +2,8 @@ import contextlib
 import unittest
 import unittest.mock
 
-from simple_env_config import env_config, CanOnlyDecorateClasses
+from simple_env_config import env_config, CanOnlyDecorateClasses, EnvironmentVariableNotFound, \
+    CannotConvertEnvironmentVariable
 
 
 @contextlib.contextmanager
@@ -104,6 +105,52 @@ class TestEnvConfig(unittest.TestCase):
             @env_config
             def f():
                 pass
+
+    def test_variable_not_found(self):
+        env = {}
+
+        with self.assertRaises(EnvironmentVariableNotFound) as cm:
+            with patch_env(env):
+                @env_config
+                class ClassWithMissingVariable:
+                    MISSING: int
+
+        exception = cm.exception
+
+        self.assertEqual("ClassWithMissingVariable", exception.class_name)
+        self.assertEqual("MISSING", exception.attribute_name)
+        self.assertEqual(int, exception.attribute_type)
+
+    def test_cannot_convert_variable(self):
+
+        test_cases = (
+            (int, ""),
+            (int, "1.5"),
+            (int, "43x"),
+            (float, ""),
+            (float, "1.4x"),
+            (bool, ""),
+            (bool, "a"),
+            (bool, "11"),
+            (bool, "00"),
+        )
+
+        for attribute_type, attribute_value in test_cases:
+            env = {f"VALUE_{attribute_type.__name__.upper()}": attribute_value}
+
+            with self.subTest(f"{attribute_type=} {attribute_value=}"), patch_env(env):
+                with self.assertRaises(CannotConvertEnvironmentVariable) as cm:
+                    @env_config
+                    class ClassWithVariableWithIncompatibleType:
+                        VALUE_INT: int = 42
+                        VALUE_FLOAT: float = 1.5
+                        VALUE_BOOL: bool = True
+
+                exception = cm.exception
+
+                self.assertEqual("ClassWithVariableWithIncompatibleType", exception.class_name)
+                self.assertEqual(attribute_type, exception.attribute_type)
+                self.assertEqual(attribute_value, exception.attribute_value)
 
 
 if __name__ == '__main__':
