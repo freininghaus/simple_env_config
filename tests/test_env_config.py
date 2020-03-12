@@ -100,6 +100,35 @@ class TestEnvConfig(unittest.TestCase):
                     self.assertTrue(A.VALUE_TRUE)
                     self.assertFalse(A.VALUE_FALSE)
 
+    def test_env_config_function(self):
+        """Test that a function is not overwritten if there is an environment variable with the same name."""
+
+        env = {
+            "WIDTH": "3",
+            "HEIGHT": "4",
+            "AREA": "this value should not overwrite a function",
+            "CIRCUMFERENCE": "this value should not overwrite a function"
+        }
+
+        with patch_env(env):
+            @env_config
+            class Rectangle:
+                WIDTH: int
+                HEIGHT: int
+
+                @staticmethod
+                def AREA():
+                    return Rectangle.WIDTH * Rectangle.HEIGHT
+
+                @staticmethod
+                def CIRCUMFERENCE():
+                    return 2 * (Rectangle.WIDTH + Rectangle.HEIGHT)
+
+            self.assertEqual(3, Rectangle.WIDTH)
+            self.assertEqual(4, Rectangle.HEIGHT)
+            self.assertEqual(12, Rectangle.AREA())
+            self.assertEqual(14, Rectangle.CIRCUMFERENCE())
+
     def test_invalid_type(self):
         with self.assertRaises(CanOnlyDecorateClasses):
             @env_config
