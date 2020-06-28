@@ -1,0 +1,12 @@
+language: python
+python:
+  # - "3.7"  # first version to support data classes
+  - "3.8"  # first version to support assignment expressions
+  - "3.9-dev"
+  - "nightly"
+  # - "pypy3"
+install:
+  - pip install -r requirements_dev.txt  # test dependencies
+  - pip install -e .  # install package such that tests can find it
+script:
+  - pytest
