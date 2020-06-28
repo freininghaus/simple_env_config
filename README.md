@@ -1,5 +1,7 @@
 # simple_env_config
 
+[![Build Status](https://travis-ci.com/freininghaus/simple_env_config.svg?branch=master)](https://travis-ci.com/freininghaus/simple_env_config)
+
 This library tries to make reading configuration values from the environment
 easy, such that you can replace code like
 
