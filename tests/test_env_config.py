@@ -2,8 +2,8 @@ import contextlib
 import unittest
 import unittest.mock
 
-from simple_env_config import env_config, CanOnlyDecorateClasses, EnvironmentVariableNotFound, \
-    CannotConvertEnvironmentVariable
+from simple_env_config import env_config, CanOnlyDecorateClassesError, EnvironmentVariableNotFoundError, \
+    CannotConvertEnvironmentVariableError
 
 
 @contextlib.contextmanager
@@ -130,7 +130,7 @@ class TestEnvConfig(unittest.TestCase):
             self.assertEqual(14, Rectangle.CIRCUMFERENCE())
 
     def test_invalid_type(self):
-        with self.assertRaises(CanOnlyDecorateClasses):
+        with self.assertRaises(CanOnlyDecorateClassesError):
             @env_config
             def f():
                 pass
@@ -138,7 +138,7 @@ class TestEnvConfig(unittest.TestCase):
     def test_variable_not_found(self):
         env = {}
 
-        with self.assertRaises(EnvironmentVariableNotFound) as cm:
+        with self.assertRaises(EnvironmentVariableNotFoundError) as cm:
             with patch_env(env):
                 @env_config
                 class ClassWithMissingVariable:
@@ -168,7 +168,7 @@ class TestEnvConfig(unittest.TestCase):
             env = {f"VALUE_{attribute_type.__name__.upper()}": attribute_value}
 
             with self.subTest(f"{attribute_type} {attribute_value}"), patch_env(env):
-                with self.assertRaises(CannotConvertEnvironmentVariable) as cm:
+                with self.assertRaises(CannotConvertEnvironmentVariableError) as cm:
                     @env_config
                     class ClassWithVariableWithIncompatibleType:
                         VALUE_INT: int = 42

@@ -1,25 +1,31 @@
 import inspect
 import os
-import dataclasses
 
 
-@dataclasses.dataclass
-class EnvironmentVariableNotFound(KeyError):
-    class_name: str
-    attribute_name: str
-    attribute_type: type
+class EnvironmentVariableNotFoundError(KeyError):
+    def __init__(self, class_name: str, attribute_name: str, attribute_type: type):
+        self.class_name = class_name
+        self.attribute_name = attribute_name
+        self.attribute_type = attribute_type
+
+        super().__init__(f"class '{self.class_name}' expects a value of type {self.attribute_type} "
+                         f"in the environment variable '{self.attribute_name}'")
 
 
-@dataclasses.dataclass
-class CannotConvertEnvironmentVariable(ValueError):
-    class_name: str
-    attribute_name: str
-    attribute_value: str
-    attribute_type: type
-    details: str
+class CannotConvertEnvironmentVariableError(ValueError):
+    def __init__(self, class_name: str, attribute_name: str, attribute_value: str, attribute_type: type, details: str):
+        self.class_name = class_name
+        self.attribute_name = attribute_name
+        self.attribute_value = attribute_value
+        self.attribute_type = attribute_type
+        self.details = details
+
+        super().__init__(f"class '{self.class_name}' expects a value of type {self.attribute_type} "
+                         f"in the environment variable '{self.attribute_name}', but the value '{self.attribute_value}' "
+                         f"could not be converted: {self.details}")
 
 
-class CanOnlyDecorateClasses(ValueError):
+class CanOnlyDecorateClassesError(ValueError):
     pass
 
 
@@ -42,7 +48,7 @@ def bool_converter(s):
 
 def env_config(cls):
     if type(cls) != type:
-        raise CanOnlyDecorateClasses(f"env_config can only decorate classes, not '{cls}'")
+        raise CanOnlyDecorateClassesError(f"env_config can only decorate classes, not '{cls}'")
 
     default_values = {
         k: v
@@ -68,13 +74,13 @@ def env_config(cls):
             try:
                 value = converter(env_value)
             except ValueError as e:
-                raise CannotConvertEnvironmentVariable(cls.__name__, attribute_name, env_value, attribute_type,
-                                                       " ".join(e.args))
+                raise CannotConvertEnvironmentVariableError(cls.__name__, attribute_name, env_value, attribute_type,
+                                                            " ".join(e.args))
         except KeyError:
             try:
                 value = default_values[attribute_name]
             except KeyError:
-                raise EnvironmentVariableNotFound(cls.__name__, attribute_name, attribute_type)
+                raise EnvironmentVariableNotFoundError(cls.__name__, attribute_name, attribute_type)
 
         setattr(cls, attribute_name, value)
 
