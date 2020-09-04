@@ -115,5 +115,6 @@ Note:
   and assigning the value `True` or `False`, respectively.
 * If the initialization of a `bool` fails because the value does not match any
   of those shown above, or the expression `T(value)` fails for any other type
-  `T`, a `simple_env_config.CannotConvertEnvironmentVariableError` is thrown.
+  `T` with a `ValueError`, a
+  `simple_env_config.CannotConvertEnvironmentVariableError` is thrown.
    
