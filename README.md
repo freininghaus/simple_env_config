@@ -10,7 +10,7 @@ replace code like
 import os
 
 PORT = int(os.getenv("PORT", 8080))
-K8S_NAMESPACE = os.env["K8S_NAMESPACE"]  # required, no default value
+K8S_NAMESPACE = os.environ["K8S_NAMESPACE"]  # required, no default value
 DEBUG_MODE = os.getenv("DEBUG_MODE", "0").lower() in ("1", "true", "yes", "on")
 
 run_app(PORT, K8S_NAMESPACE, DEBUG_MODE)
@@ -26,7 +26,6 @@ class Config:
     PORT: int = 8080
     K8S_NAMESPACE: str
     DEBUG_MODE: bool = False
-    
 
 run_app(Config.PORT, Config.K8S_NAMESPACE, Config.DEBUG_MODE)
 ```
@@ -51,3 +50,70 @@ checkers.
 
 This design requires Python 3.6 or later. Earlier versions do not support
 [annotating the types of class variables](https://docs.python.org/3/whatsnew/3.6.html#whatsnew36-pep526).
+
+## Usage
+
+The library is imported with
+```python
+import simple_env_config
+```
+or
+```python
+from simple_env_config import env_config
+```
+The following examples use the latter.
+
+### String values
+For string values, adding the `str` type hint is optional:
+```python
+@env_config
+class Strings:
+    VAR1: str = "A"
+    VAR2 = "B"
+
+print(Strings.VAR1, Strings.VAR2)
+```
+The code above ill print the values of the environment variables VAR1 and VAR2.
+If any of these are undefined, the default values will be "A" and "B",
+respectively.
+
+### Values without defaults
+If no default value is given for a variable in a class decorated with
+`@env_config`, and the environment variable does not exist, an exception is
+thrown:
+```python
+@env_config
+class Strings:
+    REQUIRED: str
+```
+results in
+```
+simple_env_config.EnvironmentVariableNotFoundError: "class 'Strings' expects a value of type <class 'str'> in the environment variable 'REQUIRED'"
+```
+if there is no environment variable named REQUIRED.
+
+### Converting to other data types
+A type hint indicates the type that the parsed environment variable value should
+be converted to:
+```python
+@env_config
+class DataTypes:
+    PORT: int = 8080
+    TOLERANCE: float = 1e-3
+    DEBUG_MODE: bool = False
+```
+Note:
+* In most cases, a variable whose type hint is `T` will be initialized with the
+  expression `T(value)`, where `value` is the string content of the environment
+  variable.
+* The exception is `bool`. Boolean values are initialized by comparing the
+  string content of the environment variable case-insensitively with the values
+  in these two groups:
+  * "1", "true", "yes", "on",
+  * "0", "false", "no", "off",
+  
+  and assigning the value `True` or `False`, respectively.
+* If the initialization of a `bool` fails because the value does not match any
+  of those shown above, or the expression `T(value)` fails for any other type
+  `T`, a `simple_env_config.CannotConvertEnvironmentVariableError` is thrown.
+   
