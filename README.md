@@ -117,4 +117,17 @@ Note:
   of those shown above, or the expression `T(value)` fails for any other type
   `T` with a `ValueError`, a
   `simple_env_config.CannotConvertEnvironmentVariableError` is thrown.
-   
+
+## Notes on similar libraries
+[env-var-config](https://pypi.org/project/env-var-config/) also makes use of
+type hints for loading environment variable values into a config object. Notable
+differences are:
+* With simple_env_config, only a class decorator is needed to initialize the
+  config object. With env_var_config, a base class and a function call are
+   required.
+* Since simple_env_config stores the loaded values in the class that contains
+  the type hints, and not in an instance of the class, it works better with
+  static type checkers.
+* simple_env_config only accepts pre-defined input strings for `bool` values.
+  For other inputs, it raises an exception, rather than converting them `False`.
+ 
