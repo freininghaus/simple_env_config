@@ -45,7 +45,7 @@ useful and offer more features, the goal is maximal simplicity:
 * Python's type hints are used to request type conversions.
 * Assignment with `=` specifies default values.
 
-Thus, very little code is needed, and everything work nicely with static type
+Thus, very little code is needed, and everything works nicely with static type
 checkers.
 
 This design requires Python 3.6 or later. Earlier versions do not support
