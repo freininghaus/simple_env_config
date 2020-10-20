@@ -84,7 +84,7 @@ class TestEnvConfig(unittest.TestCase):
                     for key in ("VALUE1", "VALUE2", "VALUE3")
                 }
 
-                with self.subTest(f"{expected_bool} {string_value}"), patch_env(env):
+                with self.subTest(f"'{string_value}' -> {expected_bool}"), patch_env(env):
                     @env_config
                     class A:
                         VALUE1: bool
@@ -169,7 +169,7 @@ class TestEnvConfig(unittest.TestCase):
         for attribute_type, attribute_value in test_cases:
             env = {f"VALUE_{attribute_type.__name__.upper()}": attribute_value}
 
-            with self.subTest(f"{attribute_type} {attribute_value}"), patch_env(env):
+            with self.subTest(f"{attribute_type.__name__}('{attribute_value}')"), patch_env(env):
                 with self.assertRaises(CannotConvertEnvironmentVariableError) as cm:
                     @env_config
                     class ClassWithVariableWithIncompatibleType:
