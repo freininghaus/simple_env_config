@@ -183,6 +183,24 @@ class TestEnvConfig(unittest.TestCase):
                 self.assertEqual(attribute_type, exception.attribute_type)
                 self.assertEqual(attribute_value, exception.attribute_value)
 
+    def test_decorator_function(self):
+        env = {
+            "KEY": "value"
+        }
+
+        with patch_env(env):
+            @env_config
+            class A:
+                KEY: str
+
+            self.assertEqual("value", A.KEY)
+
+            @env_config()
+            class B:
+                KEY: str
+
+            self.assertEqual("value", B.KEY)
+
 
 if __name__ == '__main__':
     unittest.main()

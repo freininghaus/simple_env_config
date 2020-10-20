@@ -6,7 +6,13 @@ from simple_env_config.errors import CanOnlyDecorateClassesError, CannotConvertE
     EnvironmentVariableNotFoundError
 
 
-def env_config(cls):
+def env_config(cls=None):
+    if cls is None:
+        return lambda cls_: env_config_impl(cls_)
+    return env_config_impl(cls)
+
+
+def env_config_impl(cls):
     if type(cls) != type:
         raise CanOnlyDecorateClassesError(f"env_config can only decorate classes, not '{cls}'")
 
