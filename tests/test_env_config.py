@@ -116,13 +116,15 @@ class TestEnvConfig(unittest.TestCase):
                 WIDTH: int
                 HEIGHT: int
 
+                # staticmethods can access WIDTH and HEIGHT
                 @staticmethod
                 def AREA():
                     return Rectangle.WIDTH * Rectangle.HEIGHT
 
-                @staticmethod
-                def CIRCUMFERENCE():
-                    return 2 * (Rectangle.WIDTH + Rectangle.HEIGHT)
+                # classmethods can access them too
+                @classmethod
+                def CIRCUMFERENCE(cls):
+                    return 2 * (cls.WIDTH + cls.HEIGHT)
 
             self.assertEqual(3, Rectangle.WIDTH)
             self.assertEqual(4, Rectangle.HEIGHT)
