@@ -23,16 +23,11 @@ def env_config(cls):
     for attribute_name in all_attributes:
         attribute_type = annotations.get(attribute_name, str)
 
-        if attribute_type == bool:
-            converter = converters.bool_converter
-        else:
-            converter = attribute_type
-
         try:
             env_value = os.environ[attribute_name]
 
             try:
-                value = converter(env_value)
+                value = converters.convert(env_value, attribute_type)
             except ValueError as e:
                 raise CannotConvertEnvironmentVariableError(cls.__name__, attribute_name, env_value, attribute_type,
                                                             " ".join(e.args))

@@ -13,3 +13,12 @@ def bool_converter(s):
         return BOOL_VALUES[s.lower()]
     except KeyError:
         raise ValueError(f"cannot convert to bool: {s}")
+
+
+def convert(value: str, attribute_type: type):
+    if attribute_type == bool:
+        converter = bool_converter
+    else:
+        converter = attribute_type
+
+    return converter(value)
