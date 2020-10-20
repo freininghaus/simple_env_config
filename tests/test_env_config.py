@@ -137,6 +137,11 @@ class TestEnvConfig(unittest.TestCase):
             def f():
                 pass
 
+        with self.assertRaises(CanOnlyDecorateClassesError):
+            @env_config(upper_case_variable_names=False)
+            def f():
+                pass
+
     def test_variable_not_found(self):
         env = {}
 
@@ -200,6 +205,38 @@ class TestEnvConfig(unittest.TestCase):
                 KEY: str
 
             self.assertEqual("value", B.KEY)
+
+    def test_case_sensitivity(self):
+        env = {
+            "UPPER": "value1",
+            "lower": "value2"
+        }
+
+        with patch_env(env):
+            @env_config(upper_case_variable_names=False)
+            class NoUpperCase:
+                upper: str = "default1"  # will not be overwritten because there is no env var 'upper'
+                lower: str = "default2"  # will be overwritten by env var 'lower'
+
+            self.assertEqual("default1", NoUpperCase.upper)
+            self.assertEqual("value2", NoUpperCase.lower)
+
+            @env_config(upper_case_variable_names=True)
+            class UpperCase:
+                upper: str = "default1"  # will be overwritten by env var 'UPPER'
+                lower: str = "default2"  # will not be overwritten because there is no env var 'LOWER'
+
+            self.assertEqual("value1", UpperCase.upper)
+            self.assertEqual("default2", UpperCase.lower)
+
+            # default: convert variable names to upper case
+            @env_config
+            class Default:
+                upper: str = "default1"  # will be overwritten by env var 'UPPER'
+                lower: str = "default2"  # will not be overwritten because there is no env var 'LOWER'
+
+            self.assertEqual("value1", Default.upper)
+            self.assertEqual("default2", Default.lower)
 
 
 if __name__ == '__main__':
