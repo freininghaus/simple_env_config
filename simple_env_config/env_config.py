@@ -6,7 +6,13 @@ from simple_env_config.errors import CanOnlyDecorateClassesError, CannotConvertE
     EnvironmentVariableNotFoundError
 
 
-def env_config(cls):
+def env_config(cls=None, *, upper_case_variable_names=True):
+    if cls is None:
+        return lambda cls_: env_config_impl(cls_, upper_case_variable_names)
+    return env_config_impl(cls, upper_case_variable_names)
+
+
+def env_config_impl(cls, upper_case_variable_names: bool):
     if type(cls) != type:
         raise CanOnlyDecorateClassesError(f"env_config can only decorate classes, not '{cls}'")
 
@@ -24,7 +30,7 @@ def env_config(cls):
         attribute_type = annotations.get(attribute_name, str)
 
         try:
-            env_value = os.environ[attribute_name]
+            env_value = os.environ[attribute_name.upper() if upper_case_variable_names else attribute_name]
 
             try:
                 value = converters.convert(env_value, attribute_type)
