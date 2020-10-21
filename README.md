@@ -23,12 +23,22 @@ from simple_env_config import env_config
 
 @env_config
 class Config:
-    PORT: int = 8080
-    K8S_NAMESPACE: str
-    DEBUG_MODE: bool = False
+    port: int = 8080
+    k8s_namespace: str
+    debug_mode: bool = False
 
-run_app(Config.PORT, Config.K8S_NAMESPACE, Config.DEBUG_MODE)
+run_app(Config.port, Config.k8s_namespace, Config.debug_mode)
 ```
+Note that this example uses lower case variable names in `class Config`. These
+will be converted to upper case for the environment variable lookup, i.e., the
+values will be read from the environment variables `PORT`, `K8S_NAMESPACE`, and
+`DEBUG_MODE`, respectively.
+
+This behavior can be changed: decorating the class with 
+
+    @env_config(upper_case_variable_names=False)
+
+will cause a case-sensitive variable lookup in the environment.
 
 ## Motivation
 As shown in the example above, parsing many environment variables without
@@ -68,8 +78,8 @@ For string values, adding the `str` type hint is optional:
 ```python
 @env_config
 class Strings:
-    VAR1: str = "A"
-    VAR2 = "B"
+    var1: str = "A"
+    var2 = "B"
 
 print(Strings.VAR1, Strings.VAR2)
 ```
@@ -84,7 +94,7 @@ thrown:
 ```python
 @env_config
 class Strings:
-    REQUIRED: str
+    required: str
 ```
 results in
 ```
@@ -98,9 +108,9 @@ be converted to:
 ```python
 @env_config
 class DataTypes:
-    PORT: int = 8080
-    TOLERANCE: float = 1e-3
-    DEBUG_MODE: bool = False
+    port: int = 8080
+    tolerance: float = 1e-3
+    debug_mode: bool = False
 ```
 Note:
 * In most cases, a variable whose type hint is `T` will be initialized with the
@@ -117,6 +127,27 @@ Note:
   of those shown above, or the expression `T(value)` fails for any other type
   `T` with a `ValueError`, a
   `simple_env_config.CannotConvertEnvironmentVariableError` is thrown.
+
+### Configuration
+`env_config` can be called as a function and accepts a keyword argument
+`upper_case_variable_names`. This argument controls whether the variable names
+will be converted to upper case before looking up variables in the environment:
+```python
+@env_config(upper_case_variable_names=False)
+class CaseSensitiveConfig:
+    key: str  # reads from env var 'key'
+    Key: str  # reads from env var 'Key'
+    KEY: str  # reads from env var 'KEY'
+```
+The default behavior is to consider only upper case environment variables:
+```python
+@env_config
+class DefaultConfig:
+    # all these variables read from the env var 'KEY'
+    key: str
+    Key: str
+    KEY: str
+```
 
 ## Notes on similar libraries
 [env-var-config](https://pypi.org/project/env-var-config/) also makes use of
