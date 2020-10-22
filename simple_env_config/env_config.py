@@ -28,9 +28,10 @@ def env_config_impl(cls, upper_case_variable_names: bool):
             if converters.optional_type(attribute_type) is not None
         },
         **{
-            k: v
-            for k, v in inspect.getmembers(cls)
-            if not (inspect.isroutine(v) or k.startswith("__"))
+            # Handle attributes which have a default value set with '=' in the class definition
+            attribute_name: value
+            for attribute_name, value in inspect.getmembers(cls)
+            if not (inspect.isroutine(value) or attribute_name.startswith("__"))
         }
     }
 
