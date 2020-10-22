@@ -39,6 +39,10 @@ def optional_type(t):
 
 
 def convert(value: str, attribute_type: type):
+    type_inside_optional = optional_type(attribute_type)
+    if type_inside_optional is not None:
+        return convert(value, type_inside_optional)
+
     if attribute_type == bool:
         converter = bool_converter
     else:
