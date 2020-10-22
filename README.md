@@ -112,21 +112,41 @@ class DataTypes:
     tolerance: float = 1e-3
     debug_mode: bool = False
 ```
-Note:
-* In most cases, a variable whose type hint is `T` will be initialized with the
-  expression `T(value)`, where `value` is the string content of the environment
-  variable.
-* The exception is `bool`. Boolean values are initialized by comparing the
-  string content of the environment variable case-insensitively with the values
-  in these two groups:
-  * "1", "true", "yes", "on",
-  * "0", "false", "no", "off",
-  
-  and assigning the value `True` or `False`, respectively.
-* If the initialization of a `bool` fails because the value does not match any
-  of those shown above, or the expression `T(value)` fails for any other type
-  `T` with a `ValueError`, a
-  `simple_env_config.CannotConvertEnvironmentVariableError` is thrown.
+In most cases, a variable whose type hint is `T` will be initialized with the
+expression `T(value)`, where `value` is the string content of the environment
+variable.
+
+For some types, there are special conversion rules.
+
+#### `bool` 
+Boolean values are initialized by comparing the string content of the
+environment variable case-insensitively with the values in these two groups:
+  * `"1"`, `"true"`, `"yes"`, `"on"`,
+  * `"0"`, `"false"`, `"no"`, `"off"`,
+
+and assigning the value `True` or `False`, respectively.
+
+#### `Optional[T]`
+A variable with the type hint `Optional[T]` will be initialized just like a
+variable with type hint `T`. However, it gets the implicit default value `None`:
+
+```python
+@env_config
+class ConfigWithOptionals:
+    A: Optional[int]
+    B: Optional[bool]
+```
+If neither `A` nor `B` are valid environment variables, both `A` and `B` will
+be assigned the value `None` in this class.
+
+Otherwise, the value of the environment variable `A` will be parsed as an `int`,
+and the value of `B` will be compared case-insensitively with "true", "yes",
+etc., to determine a Boolean value.
+
+#### Conversion errors
+If a conversion fails, either because the expression `T(value)` raises a
+`ValueError`, or applying the rule for types like `bool` and `Optional[T]`
+fails, a `simple_env_config.CannotConvertEnvironmentVariableError` is thrown.
 
 ### Configuration
 `env_config` can be called as a function and accepts a keyword argument
