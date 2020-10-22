@@ -265,16 +265,28 @@ class TestEnvConfig(unittest.TestCase):
 
             @env_config()
             class B:
-                # TODO: omit the default value None here. It should be added implicitly for Optional[T].
-                str_value_none: Optional[str] = None
-                int_value_none: Optional[int] = None
-                float_value_none: Optional[float] = None
-                bool_value_none: Optional[bool] = None
+                # These are not overwritten by environment variables and get the implicit default value None.
+                str_value_none: Optional[str]
+                int_value_none: Optional[int]
+                float_value_none: Optional[float]
+                bool_value_none: Optional[bool]
 
             self.assertIsNone(B.str_value_none)
             self.assertIsNone(B.int_value_none)
             self.assertIsNone(B.float_value_none)
             self.assertIsNone(B.bool_value_none)
+
+            @env_config
+            class C:
+                # Special case: if an attribute with type hint Optional[T] has an explicit default value, the implicit
+                # default value None does not apply.
+                foo: Optional[str] = "bar"
+
+                # This one has an explicit default value, but is overwritten by an environment variable.
+                str_value: Optional[str] = "abc"
+
+            self.assertEqual("bar", C.foo)
+            self.assertEqual("string_value", C.str_value)
 
 
 if __name__ == '__main__':

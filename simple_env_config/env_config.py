@@ -16,13 +16,23 @@ def env_config_impl(cls, upper_case_variable_names: bool):
     if type(cls) != type:
         raise CanOnlyDecorateClassesError(f"env_config can only decorate classes, not '{cls}'")
 
-    default_values = {
-        k: v
-        for k, v in inspect.getmembers(cls)
-        if not (inspect.isroutine(v) or k.startswith("__"))
-    }
-
     annotations = cls.__annotations__
+
+    default_values = {
+        **{
+            # Attributes with type hint Optional[T] for some T get the implicit default value None.
+            # If such an attribute has an explicit default value, it will appear in inspect.getmembers(cls) (see below),
+            # such that the implicit default value None will be overwritten.
+            attribute_name: None
+            for attribute_name, attribute_type in annotations.items()
+            if converters.optional_type(attribute_type) is not None
+        },
+        **{
+            k: v
+            for k, v in inspect.getmembers(cls)
+            if not (inspect.isroutine(v) or k.startswith("__"))
+        }
+    }
 
     all_attributes = {*default_values, *annotations}
 
