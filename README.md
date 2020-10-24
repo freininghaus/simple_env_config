@@ -1,4 +1,4 @@
-# simple_env_config
+# simple-env-config
 
 [![Build Status](https://travis-ci.com/freininghaus/simple_env_config.svg?branch=master)](https://travis-ci.com/freininghaus/simple_env_config)
 
@@ -61,6 +61,10 @@ checkers.
 This design requires Python 3.6 or later. Earlier versions do not support
 [annotating the types of class variables](https://docs.python.org/3/whatsnew/3.6.html#whatsnew36-pep526).
 
+## Installation
+```bash
+pip install simple-env-config
+```
 ## Usage
 
 The library is imported with
