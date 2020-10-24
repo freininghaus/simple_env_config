@@ -11,7 +11,7 @@ setup(
     long_description=long_description(),
     long_description_content_type="text/markdown",
     keywords="env environment config decorator",
-    version="0.1",
+    version="0.2",
     license="MIT",
     author="Frank Reininghaus",
     author_email="frank78ac@googlemail.com",
