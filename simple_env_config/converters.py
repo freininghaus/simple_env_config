@@ -1,3 +1,4 @@
+import enum
 import typing
 
 BOOL_VALUES = {
@@ -45,6 +46,8 @@ def convert(value: str, attribute_type: type):
 
     if attribute_type == bool:
         converter = bool_converter
+    elif issubclass(attribute_type, enum.Enum):
+        converter = lambda s: attribute_type[s]
     else:
         converter = attribute_type
 

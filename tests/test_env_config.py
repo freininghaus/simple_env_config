@@ -1,4 +1,5 @@
 import contextlib
+import enum
 import unittest
 import unittest.mock
 from typing import Optional
@@ -287,6 +288,31 @@ class TestEnvConfig(unittest.TestCase):
 
             self.assertEqual("bar", C.foo)
             self.assertEqual("string_value", C.str_value)
+
+    def test_enum(self):
+        env = {
+            "COLOR1": "RED",
+            "COLOR2": "GREEN",
+            "COLOR3": "YELLOW"
+        }
+
+        class Color(enum.Enum):
+            RED = enum.auto()
+            GREEN = enum.auto()
+            BLUE = enum.auto()
+
+        # TODO: test functional Enum interface
+
+        with patch_env(env):
+            @env_config
+            class A:
+                color1: Color
+                color2: Optional[Color]
+                other_color: Color = Color.BLUE
+
+            self.assertEqual(Color.RED, A.color1)
+            self.assertEqual(Color.GREEN, A.color2)
+            self.assertEqual(Color.BLUE, A.other_color)
 
 
 if __name__ == '__main__':
