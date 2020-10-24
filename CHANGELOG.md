@@ -4,6 +4,8 @@
 * Environment variable names are converted to upper case by default. Decorating
   with `@env_config(upper_case_variable_names=False)` enforces that class
   members and environment variable names are compared case-sensitively.
+* `Optional[T]` can be used as a type hint. Attributes with an `Optional[T]`
+  type hint get the implicit default value `None`.
 
 ## Version 0.1, released 2020-10-06
 * Initial release on PyPI
