@@ -314,6 +314,17 @@ class TestEnvConfig(unittest.TestCase):
             self.assertEqual(Color.GREEN, A.color2)
             self.assertEqual(Color.BLUE, A.other_color)
 
+            with self.assertRaises(CannotConvertEnvironmentVariableError) as cm:
+                @env_config
+                class InvalidColor:
+                    color3: Color
+
+            exception = cm.exception
+
+            self.assertEqual("InvalidColor", exception.class_name)
+            self.assertEqual(Color, exception.attribute_type)
+            self.assertEqual("YELLOW", exception.attribute_value)
+
 
 if __name__ == '__main__':
     unittest.main()
