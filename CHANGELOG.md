@@ -1,5 +1,8 @@
 # simple-env-config release history
 
+## Next version (not released yet!)
+* Classes derived from `enum.Enum` can be used as a type hint.
+
 ## Version 0.2, released 2020-10-24
 * Environment variable names are converted to upper case by default. Decorating
   with `@env_config(upper_case_variable_names=False)` enforces that class
