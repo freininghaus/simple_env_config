@@ -130,6 +130,24 @@ environment variable case-insensitively with the values in these two groups:
 
 and assigning the value `True` or `False`, respectively.
 
+#### Types derived from `enum.Enum`
+If `T` is a subclass of `enum.Enum`, the initialization will use the
+expression `T[value]`.
+
+In this example:
+
+```python
+class Color(enum.Enum):
+    BLACK = 1
+    WHITE = 2
+
+@env_config
+class ConfigWithEnum:
+    favorite_color: Color
+``` 
+`ConfigWithEnum.favorite_color` will have the value `Color.WHITE` if the
+ environment variable `FAVORITE_COLOR` has the value `WHITE`.
+
 #### `Optional[T]`
 A variable with the type hint `Optional[T]` will be initialized just like a
 variable with type hint `T`. However, it gets the implicit default value `None`:
