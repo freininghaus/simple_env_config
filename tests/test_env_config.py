@@ -293,7 +293,8 @@ class TestEnvConfig(unittest.TestCase):
         env = {
             "COLOR1": "RED",
             "COLOR2": "GREEN",
-            "COLOR3": "YELLOW"
+            "COLOR3": "YELLOW",
+            "FAVORITE_ANIMAL": "CAT"
         }
 
         class Color(enum.Enum):
@@ -301,7 +302,7 @@ class TestEnvConfig(unittest.TestCase):
             GREEN = enum.auto()
             BLUE = enum.auto()
 
-        # TODO: test functional Enum interface
+        Animal = enum.Enum("Animal", ("CAT", "DOG", "MOUSE"))
 
         with patch_env(env):
             @env_config
@@ -309,10 +310,12 @@ class TestEnvConfig(unittest.TestCase):
                 color1: Color
                 color2: Optional[Color]
                 other_color: Color = Color.BLUE
+                favorite_animal: Animal
 
             self.assertEqual(Color.RED, A.color1)
             self.assertEqual(Color.GREEN, A.color2)
             self.assertEqual(Color.BLUE, A.other_color)
+            self.assertEqual(Animal.CAT, A.favorite_animal)
 
             with self.assertRaises(CannotConvertEnvironmentVariableError) as cm:
                 @env_config
