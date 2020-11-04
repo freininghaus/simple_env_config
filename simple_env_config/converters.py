@@ -1,3 +1,4 @@
+import enum
 import typing
 
 BOOL_VALUES = {
@@ -15,6 +16,16 @@ def bool_converter(s):
         return BOOL_VALUES[s.lower()]
     except KeyError:
         raise ValueError(f"cannot convert to bool: {s}")
+
+
+def enum_converter(enum_type):
+    def converter(s):
+        try:
+            return enum_type[s]
+        except KeyError:
+            raise ValueError(f"Cannot convert to {enum_type}: {s}")
+
+    return converter
 
 
 def optional_type(t):
@@ -45,6 +56,8 @@ def convert(value: str, attribute_type: type):
 
     if attribute_type == bool:
         converter = bool_converter
+    elif issubclass(attribute_type, enum.Enum):
+        converter = enum_converter(attribute_type)
     else:
         converter = attribute_type
 
