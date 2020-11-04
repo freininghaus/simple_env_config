@@ -144,12 +144,29 @@ class TestEnvConfig(unittest.TestCase):
             def f():
                 pass
 
-    def test_variable_not_found(self):
+    def test_variable_not_found_lazy_check(self):
+        env = {}
+
+        with patch_env(env):
+            @env_config
+            class ClassWithMissingVariable:
+                MISSING: int
+
+        with self.assertRaises(EnvironmentVariableNotFoundError) as cm:
+            print(ClassWithMissingVariable.MISSING)
+
+        exception = cm.exception
+
+        self.assertEqual("ClassWithMissingVariable", exception.class_name)
+        self.assertEqual("MISSING", exception.attribute_name)
+        self.assertEqual(int, exception.attribute_type)
+
+    def test_variable_not_found_immediate_check(self):
         env = {}
 
         with self.assertRaises(EnvironmentVariableNotFoundError) as cm:
             with patch_env(env):
-                @env_config
+                @env_config(lazy_missing_variables_check=False)
                 class ClassWithMissingVariable:
                     MISSING: int
 
