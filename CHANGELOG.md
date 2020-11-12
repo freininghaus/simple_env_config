@@ -2,6 +2,10 @@
 
 ## Next version (not released yet!)
 * Classes derived from `enum.Enum` can be used as a type hint.
+* Missing variables without default value now causes an exception only when
+  trying to access that variable. To get the old behavior (check for missing
+  variables while parsing the class), decorate with
+  `@env_config(lazy_missing_variables_check=False)`.
 
 ## Version 0.2, released 2020-10-24
 * Environment variable names are converted to upper case by default. Decorating
