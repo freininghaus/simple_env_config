@@ -6,13 +6,13 @@ from simple_env_config.errors import CanOnlyDecorateClassesError, CannotConvertE
     EnvironmentVariableNotFoundError
 
 
-def env_config(cls=None, *, upper_case_variable_names=True):
+def env_config(cls=None, *, upper_case_variable_names: bool = True, lazy_missing_variables_check: bool = True):
     if cls is None:
-        return lambda cls_: env_config_impl(cls_, upper_case_variable_names)
-    return env_config_impl(cls, upper_case_variable_names)
+        return lambda cls_: env_config_impl(cls_, upper_case_variable_names, lazy_missing_variables_check)
+    return env_config_impl(cls, upper_case_variable_names, lazy_missing_variables_check)
 
 
-def env_config_impl(cls, upper_case_variable_names: bool):
+def env_config_impl(cls, upper_case_variable_names: bool, lazy_missing_variables_check: bool):
     if type(cls) != type:
         raise CanOnlyDecorateClassesError(f"env_config can only decorate classes, not '{cls}'")
 
@@ -52,8 +52,22 @@ def env_config_impl(cls, upper_case_variable_names: bool):
             try:
                 value = default_values[attribute_name]
             except KeyError:
-                raise EnvironmentVariableNotFoundError(cls.__name__, attribute_name, attribute_type)
+                error = EnvironmentVariableNotFoundError(cls.__name__, attribute_name, attribute_type)
+
+                if not lazy_missing_variables_check:
+                    raise error
+
+                def raise_error(cls):
+                    raise error
+
+                value = class_property(classmethod(raise_error))
 
         setattr(cls, attribute_name, value)
 
     return cls
+
+
+# Found at https://stackoverflow.com/a/1383402
+class class_property(property):
+    def __get__(self, instance, owner):
+        return self.fget.__get__(None, owner)()

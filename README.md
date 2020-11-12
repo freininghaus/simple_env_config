@@ -94,17 +94,25 @@ respectively.
 ### Values without defaults
 If no default value is given for a variable in a class decorated with
 `@env_config`, and the environment variable does not exist, an exception is
-thrown:
+thrown if the variable is accessed:
 ```python
 @env_config
 class Strings:
     required: str
+
+print(Strings.required)
 ```
 results in
 ```
 simple_env_config.EnvironmentVariableNotFoundError: "class 'Strings' expects a value of type <class 'str'> in the environment variable 'REQUIRED'"
 ```
 if there is no environment variable named REQUIRED.
+
+This behavior can be changed: decorating the class with
+
+    @env_config(lazy_missing_variables_check=False)
+
+will cause the exception to be thrown immediately when the class is parsed.
 
 ### Converting to other data types
 A type hint indicates the type that the parsed environment variable value should
@@ -171,8 +179,10 @@ If a conversion fails, either because the expression `T(value)` raises a
 fails, a `simple_env_config.CannotConvertEnvironmentVariableError` is thrown.
 
 ### Configuration
-`env_config` can be called as a function and accepts a keyword argument
-`upper_case_variable_names`. This argument controls whether the variable names
+`env_config` can be called as a function which accepts keyword arguments:
+
+#### `upper_case_variable_names`
+This argument controls whether the variable names
 will be converted to upper case before looking up variables in the environment:
 ```python
 @env_config(upper_case_variable_names=False)
@@ -189,7 +199,17 @@ class DefaultConfig:
     key: str
     Key: str
     KEY: str
-```
+
+#### `lazy_missing_variables_check`
+This Boolen argument controls how variables without default value and without
+corresponding environment variables are handled:
+* If the value is `True` (the default), an exception is thrown if the variable
+  is accessed.
+* If the value is `False`, the exception is thrown immediately while the class
+  is parsed.
+
+In both cases, the type of the exception is
+`simple_env_config.EnvironmentVariableNotFoundError`
 
 ## Notes on similar libraries
 [env-var-config](https://pypi.org/project/env-var-config/) also makes use of
