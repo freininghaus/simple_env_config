@@ -1,8 +1,12 @@
 from setuptools import setup, find_packages
 
+from version import VERSION
+
+
 def long_description():
     with open("README.md", "r") as f:
         return f.read()
+
 
 setup(
     name="simple_env_config",
@@ -11,7 +15,7 @@ setup(
     long_description=long_description(),
     long_description_content_type="text/markdown",
     keywords="env environment config decorator",
-    version="0.2",
+    version=VERSION,
     license="MIT",
     author="Frank Reininghaus",
     author_email="frank78ac@googlemail.com",
