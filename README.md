@@ -1,6 +1,7 @@
 # simple-env-config
 
-[![Build Status](https://travis-ci.com/freininghaus/simple_env_config.svg?branch=master)](https://travis-ci.com/freininghaus/simple_env_config)
+[![Travis CI](https://travis-ci.com/freininghaus/simple_env_config.svg?branch=master)](https://travis-ci.com/freininghaus/simple_env_config)
+[![Gitlab CI](https://gitlab.com/freininghaus/simple_env_config/badges/master/pipeline.svg)](https://gitlab.com/freininghaus/simple_env_config/-/pipelines)
 
 This Python library, which works with Python 3.6 and above, tries to make
 reading configuration values from the environment easy, such that you can
