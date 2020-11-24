@@ -1,0 +1,31 @@
+image: python:3.8-slim
+
+stages:
+  - test
+
+.unittests:
+  stage: test
+  script:
+    - pip install -r requirements_dev.txt  # test dependencies
+    - pip install -e .  # install package such that tests can find it
+    - pytest
+
+unittests-3.6:
+  extends: .unittests
+  image: python:3.6-slim
+
+unittests-3.7:
+  extends: .unittests
+  image: python:3.7-slim
+
+unittests-3.8:
+  extends: .unittests
+  image: python:3.8-slim
+
+unittests-3.9:
+  extends: .unittests
+  image: python:3.9-slim
+
+unittests-pypy-3.7:
+  extends: .unittests
+  image: pypy:3.7-slim
