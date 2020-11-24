@@ -2,13 +2,14 @@ image: python:3.8-slim
 
 stages:
   - test
+  - deploy
 
 .unittests:
   stage: test
   script:
     - pip install -r requirements_dev.txt  # test dependencies
     - pip install -e .  # install package such that tests can find it
-    - pytest --cov-report term --cov=simple_env_config
+    - pytest --cov-report term --cov-report html:coverage-report --cov=simple_env_config
 
 # only run on oldest and newest supported CPython version on non-master branches
 .unittests-master-only:
@@ -31,7 +32,23 @@ unittests-3.8:
 unittests-3.9:
   extends: .unittests
   image: python:3.9-slim
+  artifacts:
+    paths:
+      - coverage-report
 
 unittests-pypy-3.7:
   extends: .unittests-master-only
   image: pypy:3.7-slim
+
+pages:
+  stage: deploy
+  dependencies:
+    - unittests-3.9
+  script:
+      - mv coverage-report/ public/
+  artifacts:
+    paths:
+      - public
+    expire_in: 30 days
+  only:
+    - master

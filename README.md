@@ -2,7 +2,7 @@
 
 [![Travis CI](https://travis-ci.com/freininghaus/simple_env_config.svg?branch=master)](https://travis-ci.com/freininghaus/simple_env_config)
 [![Gitlab CI](https://gitlab.com/freininghaus/simple_env_config/badges/master/pipeline.svg)](https://gitlab.com/freininghaus/simple_env_config/-/pipelines)
-[![coverage report](https://gitlab.com/freininghaus/simple_env_config/badges/master/coverage.svg)](https://gitlab.com/freininghaus/simple_env_config/-/commits/master)
+[![coverage report](https://gitlab.com/freininghaus/simple_env_config/badges/master/coverage.svg)](https://freininghaus.gitlab.io/simple_env_config/)
 
 This Python library, which works with Python 3.6 and above, tries to make
 reading configuration values from the environment easy, such that you can
