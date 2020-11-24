@@ -8,6 +8,7 @@ stages:
   script:
     - pip install -r requirements_dev.txt  # test dependencies
     - pip install -e .  # install package such that tests can find it
+    - pytest --cov-report term --cov=simple_env_config
 
 # only run on oldest and newest supported CPython version on non-master branches
 .unittests-master-only:
