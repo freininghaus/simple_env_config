@@ -2,6 +2,8 @@ image: python:3.8-slim
 
 stages:
   - test
+  - build
+  - deploy-test
   - deploy
 
 .unittests:
@@ -39,6 +41,54 @@ unittests-3.9:
 unittests-pypy-3.7:
   extends: .unittests-master-only
   image: pypy:3.7-slim
+
+compare-version-and-tag:
+  only:
+    - tags
+  stage: test
+  script:
+    - 'TAG_VERSION=$CI_COMMIT_REF_NAME'
+    - 'PACKAGE_VERSION="v$(python version.py)"'
+    - 'echo "tag:     $TAG_VERSION"'
+    - 'echo "package: $PACKAGE_VERSION"'
+    - 'if [ $TAG_VERSION != $PACKAGE_VERSION ]; then echo "Versions do not match!"; exit 1; fi'
+
+build-package:
+  only:
+    - tags
+  stage: build
+  script:
+    - pip install setuptools wheel
+    - python setup.py sdist bdist_wheel
+  artifacts:
+    paths:
+      - dist
+
+.deploy-on-pypi-instance:
+  only:
+    - tags
+  dependencies:
+    - build-package
+  script:
+    - pip install
+      setuptools wheel twine
+    - python -m twine upload dist/*
+
+deploy-test-pypi:
+  extends: .deploy-on-pypi-instance
+  stage: deploy-test
+  variables:
+    TWINE_USERNAME: __token__
+    TWINE_PASSWORD: $TEST_PYPI_API_TOKEN
+    TWINE_REPOSITORY: test-pypi
+
+deploy-pypi:
+  extends: .deploy-on-pypi-instance
+  stage: deploy
+  variables:
+    TWINE_USERNAME: __token__
+    TWINE_PASSWORD: $PYPI_API_TOKEN
+  when: manual
 
 pages:
   stage: deploy
